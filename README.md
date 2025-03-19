@@ -31,6 +31,6 @@ in order to start the server on your localhost
 
 ## Available endpoints
  ```
-http://localhost:8080/dht
+http://localhost:8080/sensor/dht
 ```
 provides temperature and humidity of DHT sensor connected to your Arduino WiFi
