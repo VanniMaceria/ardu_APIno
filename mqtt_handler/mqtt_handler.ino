@@ -3,7 +3,7 @@
 #include <WiFi101.h>
 #include "wifi_credentials.h"
 
-#define DHT11PIN 4
+#define DHT11PIN 4  //pin collegato al DHT
 
 dht11 DHT11;
 
