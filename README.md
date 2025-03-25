@@ -4,7 +4,7 @@
 [![License: MIT][license_badge]][license_link]
 [![Powered by Dart Frog](https://img.shields.io/endpoint?url=https://tinyurl.com/dartfrog-badge)](https://dartfrog.vgv.dev)
 
-A RESTful API written in Dart Frog for interacting with arduino sensors and actuators
+A RESTful API written in Dart Frog for interacting with arduino/esp sensors and actuators
 
 [license_badge]: https://img.shields.io/badge/license-MIT-blue.svg
 [license_link]: https://opensource.org/licenses/MIT
@@ -12,8 +12,9 @@ A RESTful API written in Dart Frog for interacting with arduino sensors and actu
 [very_good_analysis_link]: https://pub.dev/packages/very_good_analysis
 
 ## What you need
-- Arduino UNO WiFi or similar;
+- ESP32 or similar;
 - DHT sensor;
+- LED
 
 ## How to use it
 First, check [Dart Frog Docs](https://dartfrog.vgv.dev/docs/overview) to install Dart Frog.
