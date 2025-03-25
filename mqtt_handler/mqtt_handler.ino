@@ -1,11 +1,14 @@
-#include <dht11.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <WiFi.h>
 #include <ArduinoMqttClient.h>
-#include <WiFi101.h>
 #include "wifi_credentials.h"
 
-#define DHT11PIN 4  //pin collegato al DHT
+#define DHTPIN 16  //pin collegato al DHT
+#define DHTTYPE DHT11  
+#define LEDPIN 13  //pin del LED
 
-dht11 DHT11;
+DHT dht(DHTPIN, DHTTYPE);
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
@@ -13,91 +16,103 @@ MqttClient mqttClient(wifiClient);
 char ssid[] = SECRET_SSID;
 char pwd[] = SECRET_PASS;
 
-//mqtt settings
-const char broker[] = "test.mosquitto.org"; //ip del broker MQTT a cui mi collego
+//MQTT settings
+const char broker[] = "test.mosquitto.org";
 int port = 1883;
 const char topicTemp[] = "temp_mia_api";
 const char topicHum[] = "hum_mia_api"; 
+const char topicVoltage[] = "voltaggio_led_mia_api";
 
 float temp = 0.0;
 float hum = 0.0;
 
+int ledState = LOW;  //stato iniziale del LED
 
-void  setup(){
-  Serial.begin(9600);
+void setup() {
+  Serial.begin(115200);
+  dht.begin();
 
-  //connessione alla rete
-  Serial.print("Tentativo di connessione alla rete");
+  pinMode(DHTPIN, INPUT);
+  pinMode(LEDPIN, OUTPUT);  //imposta il pin del LED come uscita
+
+  // Connessione alla rete WiFi
+  Serial.print("Connessione a ");
   Serial.println(ssid);
+  WiFi.begin(ssid, pwd);
 
-  while (WiFi.begin(ssid, pwd) != WL_CONNECTED) {
-    //riprova
+  while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
-    delay(5000);
+    delay(500);
   }
 
-  Serial.println("Sei connesso alla rete");
-  Serial.println();
-  //
+  Serial.println("\nConnesso alla rete WiFi");
 
-  //connessione al broker mqtt
-  Serial.print("Tentativo di connessione al broker MQTT: ");
-  Serial.println(broker);
-
+  // Connessione al broker MQTT
+  Serial.print("Connessione al broker MQTT...");
   while (!mqttClient.connect(broker, port)) {
-    Serial.print("MQTT connection failed! Error code = ");
-    Serial.println(mqttClient.connectError());
-    Serial.println("Riprovo tra 5 secondi...");
+    Serial.println("Connessione fallita! Riprovo tra 5 secondi...");
     delay(5000);
   }
+  Serial.println("Connesso al broker MQTT!");
 
-  Serial.println("Sei connesso al broker MQTT");
-  //
-
-  Serial.println();
+  //sottoscrizione al topic per il voltaggio del LED
+  mqttClient.subscribe(topicVoltage, 1);  //sottoscrivi al topic luminosità con QoS-1
+  mqttClient.onMessage(onMessageReceived);  //imposta il callback per gestire i messaggi
 }
 
-void loop()
-{
-  //serve a mandare dei "keep-alive" per notificare il broker di non interrompere la connessione
-  mqttClient.poll();
+void loop() {
+  mqttClient.poll(); //mantiene la connessione MQTT attiva e gestisce i messaggi
 
   //legge i dati dal sensore
   readDHT();
+  
   //invia i dati al broker MQTT
   publishViaMQTT();
   
-  delay(2000);
-
+  delay(5000);
 }
 
 void readDHT() {
-  int status = DHT11.read(DHT11PIN);
-  Serial.print("Lettura DHT: ");
-  Serial.println(status);
+  hum = dht.readHumidity();
+  temp = dht.readTemperature();
 
-  if (status == DHTLIB_OK) {
-    Serial.print("Umidità (%): ");
-    hum = (float) DHT11.humidity;
-    Serial.println(hum, 2);
-
-    Serial.print("Temperatura  (C): ");
-    temp = (float) DHT11.temperature;
-    Serial.println(temp, 2);
-  } else {
-    Serial.println("Errore nella lettura del DHT11");
-  }
-  Serial.println();
+  Serial.print("Umidità: ");
+  Serial.print(hum);
+  Serial.print(" %");
+  Serial.print("Temperatura: ");
+  Serial.print(temp);
+  Serial.println(" °C");
 }
 
-void publishViaMQTT(){
-  mqttClient.beginMessage(topicHum, true);  //true indica retained, serve a pubblicare il messaggio ai nuovi arrivati sul broker
+void publishViaMQTT() {
+  mqttClient.beginMessage(topicHum, true);
   mqttClient.print(hum);
   mqttClient.endMessage();
 
   mqttClient.beginMessage(topicTemp, true);
   mqttClient.print(temp);
   mqttClient.endMessage();
+}
 
-  Serial.println();
+void onMessageReceived(int messageSize) {
+  //legge il messaggio ricevuto
+  String topic = mqttClient.messageTopic();
+  String payload = mqttClient.readString(); 
+  Serial.print("Messaggio ricevuto sul topic: ");
+  Serial.println(topic);
+  Serial.print("Payload: ");
+  Serial.println(payload);
+
+  //controlla il topic e il valore ricevuto per il voltaggio
+  if (topic == topicVoltage) {
+    int brightness = payload.toInt(); //converte il payload in intero (luminosità)
+
+    //limita la luminosità a un valore tra 0 e 255
+    brightness = constrain(brightness, 0, 255);
+
+    //imposta la luminosità del LED tramite PWM
+    analogWrite(LEDPIN, brightness);  //usa PWM per impostare la luminosità del LED
+    Serial.print("Luminosità del LED settata a: ");
+    Serial.println(brightness);
+  }
 }
