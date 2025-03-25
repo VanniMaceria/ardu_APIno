@@ -34,7 +34,7 @@ in order to start the server on your localhost
  ```
 http://localhost:8080/sensor/dht - GET
 ```
-provides temperature and humidity of DHT sensor connected to your Arduino WiF
+provides temperature and humidity of DHT sensor connected to your micro-controller
 
 
 ```
