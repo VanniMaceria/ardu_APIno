@@ -32,6 +32,12 @@ in order to start the server on your localhost
 
 ## Available endpoints
  ```
-http://localhost:8080/sensor/dht
+http://localhost:8080/sensor/dht - GET
 ```
-provides temperature and humidity of DHT sensor connected to your Arduino WiFi
+provides temperature and humidity of DHT sensor connected to your Arduino WiF
+
+
+```
+http://localhost:8080/actuator/led - POST
+```
+turns on the LED with the intensity specified by the 'voltage' parameter
