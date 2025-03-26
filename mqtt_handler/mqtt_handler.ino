@@ -26,8 +26,6 @@ const char topicVoltage[] = "voltaggio_led_mia_api";
 float temp = 0.0;
 float hum = 0.0;
 
-int ledState = LOW;  //stato iniziale del LED
-
 void setup() {
   Serial.begin(115200);
   dht.begin();
@@ -57,7 +55,7 @@ void setup() {
 
   //sottoscrizione al topic per il voltaggio del LED
   mqttClient.subscribe(topicVoltage, 1);  //sottoscrivi al topic luminosità con QoS-1
-  mqttClient.onMessage(onMessageReceived);  //imposta il callback per gestire i messaggi
+  mqttClient.onMessage(onMessageReceived);  //imposta la callback per gestire i messaggi
 }
 
 void loop() {
@@ -111,7 +109,7 @@ void onMessageReceived(int messageSize) {
     brightness = constrain(brightness, 0, 255);
 
     //imposta la luminosità del LED tramite PWM
-    analogWrite(LEDPIN, brightness);  //usa PWM per impostare la luminosità del LED
+    analogWrite(LEDPIN, brightness);
     Serial.print("Luminosità del LED settata a: ");
     Serial.println(brightness);
   }
