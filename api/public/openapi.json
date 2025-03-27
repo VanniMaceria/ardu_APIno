@@ -28,7 +28,7 @@
   "tags": [
     {
       "name": "led",
-      "description": "Turns on the LED with the intensity specified by the 'voltage' parameter - (0 - 255)"
+      "description": "Turns on the LED with the intensity specified by the 'voltage' parameter (0 - 255)"
     },
     {
       "name": "dht",
