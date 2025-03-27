@@ -7,6 +7,7 @@ import 'package:typed_data/typed_data.dart';
 final mqttClient = MqttServerClient('test.mosquitto.org', '1883');
 int voltage = 0;
 
+/// @Allow(POST)
 Future<Response> onRequest(RequestContext context) async {
   final request = context.request;
   if (request.method == HttpMethod.post) {
@@ -39,7 +40,7 @@ Future<Response> doPost(Request request) async {
 
   await connectToMQTTBroker();
 
-  return Response.json(body: 'Voltage successfully forwarded');
+  return Response.json(body: {'status': 'Voltage successfully forwarded'});
 }
 
 Future<void> connectToMQTTBroker() async {

@@ -1,0 +1,96 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ardu_APIno",
+    "description": "A sample API for interacting with arduino sensors and actuators",
+    "termsOfService": "http://localhost",
+    "contact": {
+      "name": "Andrea Bucci",
+      "url": "http://localhost",
+      "email": "andreabucci123@gmail.com"
+    },
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "",
+    "url": "http://localhost/"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "led",
+      "description": "Turns on the LED with the intensity specified by the 'voltage' parameter - (0 - 255)"
+    },
+    {
+      "name": "dht",
+      "description": "Retrieves humidiy and temperature from DHT11 sensor"
+    }
+  ],
+  "components": {
+    "schemas": {},
+    "securitySchemes": {}
+  },
+  "paths": {
+    "/actuator/led": {
+      "post": {
+        "tags": [
+          "led"
+        ],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created led.",
+            "headers": {},
+            "content": {}
+          }
+        },
+        "parameters": [],
+        "security": []
+      }
+    },
+    "/sensor/dht": {
+      "get": {
+        "tags": [
+          "dht"
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of dht.",
+            "headers": {},
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "security": []
+      }
+    }
+  }
+}

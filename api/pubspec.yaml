@@ -9,6 +9,7 @@ environment:
 dependencies:
   dart_frog: ^1.1.0
   mqtt_client: ^10.5.1
+  nenuphar_cli: ^0.2.2
 
 dev_dependencies:
   mocktail: ^1.0.3

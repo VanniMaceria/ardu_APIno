@@ -6,6 +6,7 @@ final mqttClient = MqttServerClient('test.mosquitto.org', '1883');
 String temp = '';
 String hum = '';
 
+/// @Allow(GET)
 Response onRequest(RequestContext context) {
   final request = context.request;
   final method = request.method;

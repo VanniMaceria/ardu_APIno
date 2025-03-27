@@ -1,0 +1,29 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "ardu_APIno",
+    "description": "A sample API for interacting with arduino sensors and actuators",
+    "termsOfService": "http://localhost",
+    "contact": {
+      "name": "none",
+      "url": "http://localhost",
+      "email": "none@api.com"
+    },
+    "license": {
+      "name": "",
+      "url": ""
+    },
+    "version": "0.0.0"
+  },
+  "externalDocs": {
+    "description": "",
+    "url": "http://localhost/"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local server"
+    }
+  ],
+  "paths": {}
+}
