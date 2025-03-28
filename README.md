@@ -41,3 +41,10 @@ provides temperature and humidity of DHT sensor connected to your micro-controll
 http://localhost:8080/actuator/led - POST
 ```
 turns on the LED with the intensity specified by the 'voltage' parameter
+
+## Swagger
+By going to 
+```
+http://localhost:8080/index.html
+```
+you can access to the Swagger UI OpenAPI 
