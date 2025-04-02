@@ -6,6 +6,7 @@ import 'package:typed_data/typed_data.dart';
 
 final mqttClient = MqttServerClient('test.mosquitto.org', '1883');
 int voltage = 0;
+String color = '';
 
 /// @Allow(POST)
 Future<Response> onRequest(RequestContext context) async {
@@ -21,8 +22,12 @@ Future<Response> doPost(Request request) async {
   final data = jsonDecode(body) as Map<String, dynamic>;
 
   // Estrarre 'voltage' dalla richiesta e verificare che sia un intero
-  if (data.containsKey('voltage') && data['voltage'] is int) {
+  if (data.containsKey('voltage') &&
+      data['voltage'] is int &&
+      data.containsKey('color') &&
+      data['color'] is String) {
     voltage = data['voltage'] as int;
+    color = data['color'] as String;
   } else {
     return Response.json(
       statusCode: 400,
@@ -40,7 +45,8 @@ Future<Response> doPost(Request request) async {
 
   await connectToMQTTBroker();
 
-  return Response.json(body: {'status': 'Voltage successfully forwarded'});
+  return Response.json(
+      body: {'status': 'Voltage and Color successfully forwarded'});
 }
 
 Future<void> connectToMQTTBroker() async {
@@ -54,7 +60,7 @@ Future<void> connectToMQTTBroker() async {
 
   if (mqttClient.connectionStatus!.state == MqttConnectionState.connected) {
     print('Connesso al broker MQTT');
-    await publishAtTopic('voltaggio_led_mia_api', voltage);
+    await publishAtTopic('voltaggio_led_mia_api', voltage, color);
   } else {
     print(
       'Connessione fallita con codice ${mqttClient.connectionStatus!.state}',
@@ -63,12 +69,15 @@ Future<void> connectToMQTTBroker() async {
   }
 }
 
-Future<void> publishAtTopic(String topic, int voltage) async {
-  // Converti voltage in stringa
-  String voltageStr = voltage.toString();
+Future<void> publishAtTopic(String topic, int voltage, String color) async {
+  // Creazione dell'oggetto JSON
+  Map<String, dynamic> data = {'voltage': voltage, 'color': color};
 
-  // Converti la stringa in Uint8Buffer
-  Uint8Buffer buffer = Uint8Buffer()..addAll(voltageStr.codeUnits);
+  // Conversione in stringa JSON
+  String jsonString = jsonEncode(data);
+
+  // Conversione della stringa JSON in Uint8Buffer
+  Uint8Buffer buffer = Uint8Buffer()..addAll(utf8.encode(jsonString));
 
   // Pubblica il messaggio su MQTT
   mqttClient.publishMessage(topic, MqttQos.atLeastOnce, buffer);

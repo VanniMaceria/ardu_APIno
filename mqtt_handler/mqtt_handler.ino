@@ -3,12 +3,15 @@
 #include <WiFi.h>
 #include <ArduinoMqttClient.h>
 #include "wifi_credentials.h"
+#include <ArduinoJson.h>
 
-#define DHTPIN 16  //pin collegato al DHT
-#define DHTTYPE DHT11  
-#define LEDPIN 13  //pin del LED
+#define DHT_PIN 16  //pin collegato al DHT
+#define DHT_TYPE DHT11  
+#define RED_LED_PIN 13  
+#define GREEN_LED_PIN 14  
+#define BLUE_LED_PIN 15
 
-DHT dht(DHTPIN, DHTTYPE);
+DHT dht(DHT_PIN, DHT_TYPE);
 
 WiFiClient wifiClient;
 MqttClient mqttClient(wifiClient);
@@ -30,8 +33,11 @@ void setup() {
   Serial.begin(115200);
   dht.begin();
 
-  pinMode(DHTPIN, INPUT);
-  pinMode(LEDPIN, OUTPUT);  //imposta il pin del LED come uscita
+  pinMode(DHT_PIN, INPUT);  //pin DHT come input
+  //imposta i pin dei LED RGB come uscita
+  pinMode(RED_LED_PIN, OUTPUT);  
+  pinMode(GREEN_LED_PIN, OUTPUT);  
+  pinMode(BLUE_LED_PIN, OUTPUT); 
 
   // Connessione alla rete WiFi
   Serial.print("Connessione a ");
@@ -93,24 +99,48 @@ void publishViaMQTT() {
 }
 
 void onMessageReceived(int messageSize) {
-  //legge il messaggio ricevuto
+  //legge il topic e il payload
   String topic = mqttClient.messageTopic();
-  String payload = mqttClient.readString(); 
+  String payload = mqttClient.readString();
+  
   Serial.print("Messaggio ricevuto sul topic: ");
   Serial.println(topic);
   Serial.print("Payload: ");
   Serial.println(payload);
 
-  //controlla il topic e il valore ricevuto per il voltaggio
+  //controlla il topic
   if (topic == topicVoltage) {
-    int brightness = payload.toInt(); //converte il payload in intero (luminosità)
+    StaticJsonDocument<200> doc;  //oggetto JSON
+    DeserializationError error = deserializeJson(doc, payload); //parsing del JSON
+    
+    if (error) {
+      Serial.print("Errore nel parsing JSON: ");
+      Serial.println(error.c_str());
+      return;
+    }
 
-    //limita la luminosità a un valore tra 0 e 255
-    brightness = constrain(brightness, 0, 255);
+    //estraggo i valori dal JSON
+    int voltage = doc["voltage"];
+    String color = doc["color"];
 
-    //imposta la luminosità del LED tramite PWM
-    analogWrite(LEDPIN, brightness);
-    Serial.print("Luminosità del LED settata a: ");
+    //limita il valore del voltaggio tra 0 e 255 (luminosità LED)
+    int brightness = constrain(voltage, 0, 255);
+
+    //accende il LED giusto in base al colore ricevuto
+   if (color.equalsIgnoreCase("red")) {
+      analogWrite(RED_LED_PIN, brightness);
+    } else if (color.equalsIgnoreCase("green")) {
+      analogWrite(GREEN_LED_PIN, brightness);
+    } else if (color.equalsIgnoreCase("blue")) {
+      analogWrite(BLUE_LED_PIN, brightness);
+    } else {
+      Serial.println("Colore non riconosciuto!");
+    }
+
+    Serial.print("Luminosità del LED ");
+    Serial.print(color);
+    Serial.print(" settata a: ");
     Serial.println(brightness);
   }
 }
+
