@@ -27,7 +27,7 @@ in order to start the server on your localhost
 
 ## Workflow example
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/3dd2e9ce-75cc-4360-859d-756c0e697afa" width="700" height="400">
+  <img src="https://github.com/user-attachments/assets/140c04b8-1026-4b70-ad9d-ae2b1f79d46a" width="700" height="400">
 </p>
 
 ## Available endpoints
