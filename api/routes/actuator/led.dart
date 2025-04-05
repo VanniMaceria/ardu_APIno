@@ -5,7 +5,7 @@ import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:typed_data/typed_data.dart';
 
 final mqttClient = MqttServerClient('test.mosquitto.org', '1883');
-int voltage = 0;
+int brightness = 0;
 String color = '';
 
 /// @Allow(POST)
@@ -21,17 +21,17 @@ Future<Response> doPost(Request request) async {
   final body = await request.body();
   final data = jsonDecode(body) as Map<String, dynamic>;
 
-  // Estrarre 'voltage' dalla richiesta e verificare che sia un intero
-  if (data.containsKey('voltage') &&
-      data['voltage'] is int &&
+  // Estrarre 'brightness' dalla richiesta e verificare che sia un intero
+  if (data.containsKey('brightness') &&
+      data['brightness'] is int &&
       data.containsKey('color') &&
       data['color'] is String) {
-    voltage = data['voltage'] as int;
+    brightness = data['brightness'] as int;
     color = data['color'] as String;
   } else {
     return Response.json(
       statusCode: 400,
-      body: {'error': 'Invalid voltage value'},
+      body: {'error': 'Invalid brightness value'},
     );
   }
 
@@ -46,7 +46,7 @@ Future<Response> doPost(Request request) async {
   await connectToMQTTBroker();
 
   return Response.json(
-      body: {'status': 'Voltage and Color successfully forwarded'});
+      body: {'status': 'brightness and Color successfully forwarded'});
 }
 
 Future<void> connectToMQTTBroker() async {
@@ -60,7 +60,7 @@ Future<void> connectToMQTTBroker() async {
 
   if (mqttClient.connectionStatus!.state == MqttConnectionState.connected) {
     print('Connesso al broker MQTT');
-    await publishAtTopic('voltaggio_led_mia_api', voltage, color);
+    await publishAtTopic('led_mia_api', brightness, color);
   } else {
     print(
       'Connessione fallita con codice ${mqttClient.connectionStatus!.state}',
@@ -69,9 +69,9 @@ Future<void> connectToMQTTBroker() async {
   }
 }
 
-Future<void> publishAtTopic(String topic, int voltage, String color) async {
+Future<void> publishAtTopic(String topic, int brightness, String color) async {
   // Creazione dell'oggetto JSON
-  Map<String, dynamic> data = {'voltage': voltage, 'color': color};
+  Map<String, dynamic> data = {'brightness': brightness, 'color': color};
 
   // Conversione in stringa JSON
   String jsonString = jsonEncode(data);

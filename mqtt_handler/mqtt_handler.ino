@@ -24,7 +24,7 @@ const char broker[] = "test.mosquitto.org";
 int port = 1883;
 const char topicTemp[] = "temp_mia_api";
 const char topicHum[] = "hum_mia_api"; 
-const char topicVoltage[] = "voltaggio_led_mia_api";
+const char topicbrightness[] = "led_mia_api";
 
 float temp = 0.0;
 float hum = 0.0;
@@ -59,8 +59,8 @@ void setup() {
   }
   Serial.println("Connesso al broker MQTT!");
 
-  //sottoscrizione al topic per il voltaggio del LED
-  mqttClient.subscribe(topicVoltage, 1);  //sottoscrivi al topic luminosità con QoS-1
+  //sottoscrizione al topic per l'accensione del LED
+  mqttClient.subscribe(topicbrightness, 1);  //sottoscrivi al topic luminosità con QoS-1
   mqttClient.onMessage(onMessageReceived);  //imposta la callback per gestire i messaggi
 }
 
@@ -109,7 +109,7 @@ void onMessageReceived(int messageSize) {
   Serial.println(payload);
 
   //controlla il topic
-  if (topic == topicVoltage) {
+  if (topic == topicbrightness) {
     StaticJsonDocument<200> doc;  //oggetto JSON
     DeserializationError error = deserializeJson(doc, payload); //parsing del JSON
     
@@ -120,11 +120,11 @@ void onMessageReceived(int messageSize) {
     }
 
     //estraggo i valori dal JSON
-    int voltage = doc["voltage"];
+    int brightness = doc["brightness"];
     String color = doc["color"];
 
-    //limita il valore del voltaggio tra 0 e 255 (luminosità LED)
-    int brightness = constrain(voltage, 0, 255);
+    //limita il valore della luminosità tra 0 e 255
+    int brightness = constrain(brightness, 0, 255);
 
     //accende il LED giusto in base al colore ricevuto
    if (color.equalsIgnoreCase("red")) {
