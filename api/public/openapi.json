@@ -5,15 +5,15 @@
     "description": "A sample API for interacting with arduino sensors and actuators",
     "termsOfService": "http://localhost",
     "contact": {
-      "name": "Andrea Bucci",
+      "name": "none",
       "url": "http://localhost",
-      "email": "andreabucci123@gmail.com"
+      "email": "none@api.com"
     },
     "license": {
       "name": "",
       "url": ""
     },
-    "version": "1.0.0"
+    "version": "0.0.0"
   },
   "externalDocs": {
     "description": "",
@@ -31,8 +31,12 @@
       "description": "Turns on the LED with the intensity and color specified by the 'voltage' parameter (0 - 255) and 'color' (RED - GREEN - BLUE)"
     },
     {
+      "name": "rgb_led",
+      "description": "Turns on the LED with the RGB parameters (0 - 255)"
+    },
+    {
       "name": "dht",
-      "description": "Retrieves humidiy and temperature from DHT11 sensor"
+      "description": "Operations about dht"
     }
   ],
   "components": {
@@ -59,6 +63,33 @@
         "responses": {
           "201": {
             "description": "Created led.",
+            "headers": {},
+            "content": {}
+          }
+        },
+        "parameters": [],
+        "security": []
+      }
+    },
+    "/actuator/rgb_led": {
+      "post": {
+        "tags": [
+          "rgb_led"
+        ],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created rgb_led.",
             "headers": {},
             "content": {}
           }

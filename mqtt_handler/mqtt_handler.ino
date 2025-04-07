@@ -10,6 +10,9 @@
 #define RED_LED_PIN 13  
 #define GREEN_LED_PIN 14  
 #define BLUE_LED_PIN 15
+#define RGB_RED_PIN 19
+#define RGB_GREEN_PIN 18
+#define RGB_BLUE_PIN 17
 
 DHT dht(DHT_PIN, DHT_TYPE);
 
@@ -25,6 +28,7 @@ int port = 1883;
 const char topicTemp[] = "temp_mia_api";
 const char topicHum[] = "hum_mia_api"; 
 const char topicbrightness[] = "led_mia_api";
+const char topicRGB_led[] = "RGB_led_mia_api";
 
 float temp = 0.0;
 float hum = 0.0;
@@ -38,6 +42,10 @@ void setup() {
   pinMode(RED_LED_PIN, OUTPUT);  
   pinMode(GREEN_LED_PIN, OUTPUT);  
   pinMode(BLUE_LED_PIN, OUTPUT); 
+
+  pinMode(RGB_RED_PIN, OUTPUT);  
+  pinMode(RGB_GREEN_PIN, OUTPUT);  
+  pinMode(RGB_BLUE_PIN, OUTPUT); 
 
   // Connessione alla rete WiFi
   Serial.print("Connessione a ");
@@ -59,8 +67,8 @@ void setup() {
   }
   Serial.println("Connesso al broker MQTT!");
 
-  //sottoscrizione al topic per l'accensione del LED
-  mqttClient.subscribe(topicbrightness, 1);  //sottoscrivi al topic luminosità con QoS-1
+  mqttClient.subscribe(topicbrightness, 1);  //sottoscrivi al topic di accensione led con QoS-1
+  mqttClient.subscribe(topicRGB_led, 1);
   mqttClient.onMessage(onMessageReceived);  //imposta la callback per gestire i messaggi
 }
 
@@ -108,11 +116,11 @@ void onMessageReceived(int messageSize) {
   Serial.print("Payload: ");
   Serial.println(payload);
 
+  StaticJsonDocument<200> doc;  //oggetto JSON
+  DeserializationError error = deserializeJson(doc, payload); //parsing del JSON
+
   //controlla il topic
   if (topic == topicbrightness) {
-    StaticJsonDocument<200> doc;  //oggetto JSON
-    DeserializationError error = deserializeJson(doc, payload); //parsing del JSON
-    
     if (error) {
       Serial.print("Errore nel parsing JSON: ");
       Serial.println(error.c_str());
@@ -124,23 +132,36 @@ void onMessageReceived(int messageSize) {
     String color = doc["color"];
 
     //limita il valore della luminosità tra 0 e 255
-    int brightness = constrain(brightness, 0, 255);
+    int brightness_constrained = constrain(brightness, 0, 255);
 
     //accende il LED giusto in base al colore ricevuto
-   if (color.equalsIgnoreCase("red")) {
-      analogWrite(RED_LED_PIN, brightness);
-    } else if (color.equalsIgnoreCase("green")) {
-      analogWrite(GREEN_LED_PIN, brightness);
-    } else if (color.equalsIgnoreCase("blue")) {
-      analogWrite(BLUE_LED_PIN, brightness);
-    } else {
-      Serial.println("Colore non riconosciuto!");
-    }
+    if (color.equalsIgnoreCase("red")) {
+        analogWrite(RED_LED_PIN, brightness_constrained);
+      } else if (color.equalsIgnoreCase("green")) {
+        analogWrite(GREEN_LED_PIN, brightness_constrained);
+      } else if (color.equalsIgnoreCase("blue")) {
+        analogWrite(BLUE_LED_PIN, brightness_constrained);
+      } else {
+        Serial.println("Colore non riconosciuto!");
+      }
 
     Serial.print("Luminosità del LED ");
     Serial.print(color);
     Serial.print(" settata a: ");
-    Serial.println(brightness);
+    Serial.println(brightness_constrained);
+
+  } else if(topic == topicRGB_led){
+      if (error) {
+        Serial.print("Errore nel parsing JSON: ");
+        Serial.println(error.c_str());
+        return;
+      }
+
+      //constrain(doc["r"] | 0, 0, 255) -> per 'r' prende il valore o usa 0 se manca e lo limita tra 0 e 255
+      analogWrite(RGB_RED_PIN, (int)constrain(doc["r"] | 0, 0, 255));
+      analogWrite(RGB_GREEN_PIN, (int)constrain(doc["g"] | 0, 0, 255));
+      analogWrite(RGB_BLUE_PIN, (int)constrain(doc["b"] | 0, 0, 255));
+
   }
 }
 
