@@ -38,9 +38,14 @@ provides temperature and humidity of DHT sensor connected to your micro-controll
 
 
 ```
-http://localhost:8080/actuator/led - POST
+http://localhost:8080/actuator/rgb_led - POST
 ```
 turns on the LED with the intensity and color specified by the 'brightness' (0 - 255) parameter and 'color' (RED - GREEN - BLUE)
+
+```
+http://localhost:8080/actuator/led - POST
+```
+turns on the LED with the 'r', 'g' and 'b' parameters (0 - 255)
 
 ## Swagger
 By going to 
