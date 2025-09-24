@@ -15,6 +15,7 @@ A RESTful API written in Dart Frog for interacting with arduino/esp sensors and 
 - ESP32 or similar;
 - DHT sensor;
 - LED
+- DC motor with fan
 
 ## How to use it
 First, check [Dart Frog Docs](https://dartfrog.vgv.dev/docs/overview) to install Dart Frog.
@@ -46,6 +47,11 @@ turns on the LED with the 'r', 'g' and 'b' parameters (0 - 255)
 http://localhost:8080/actuator/led - POST
 ```
 turns on the LED with the intensity and color specified by the 'brightness' (0 - 255) parameter and 'color' (RED - GREEN - BLUE)
+
+```
+http://localhost:8080/actuator/fan_motor - POST
+```
+turns on the fan by using "speed" parameter (0 - 255)
 
 
 ## Swagger
