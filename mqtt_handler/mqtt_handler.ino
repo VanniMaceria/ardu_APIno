@@ -172,7 +172,7 @@ void onMessageReceived(int messageSize) {
     speed = constrain(speed, 0, 255);
 
     if (speed != lastSpeed) {
-      analogWrite(FAN_PIN, speed);  //imposta la velcoità delle ventola
+      analogWrite(FAN_PIN, speed);  //imposta la velocità delle ventola
       lastSpeed = speed;
 
       Serial.print("Nuova velocità: ");
