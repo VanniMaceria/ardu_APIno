@@ -27,12 +27,16 @@
   ],
   "tags": [
     {
+      "name": "fan_motor",
+      "description": "Operations about fan_motor"
+    },
+    {
       "name": "led",
-      "description": "Turns on the LED with the intensity and color specified by the 'voltage' parameter (0 - 255) and 'color' (RED - GREEN - BLUE)"
+      "description": "Operations about led"
     },
     {
       "name": "rgb_led",
-      "description": "Turns on the LED with the RGB parameters (0 - 255)"
+      "description": "Operations about rgb_led"
     },
     {
       "name": "dht",
@@ -44,6 +48,33 @@
     "securitySchemes": {}
   },
   "paths": {
+    "/actuator/fan_motor": {
+      "post": {
+        "tags": [
+          "fan_motor"
+        ],
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created fan_motor.",
+            "headers": {},
+            "content": {}
+          }
+        },
+        "parameters": [],
+        "security": []
+      }
+    },
     "/actuator/led": {
       "post": {
         "tags": [

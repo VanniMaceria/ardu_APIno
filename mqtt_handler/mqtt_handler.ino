@@ -13,6 +13,7 @@
 #define RGB_RED_PIN 19
 #define RGB_GREEN_PIN 18
 #define RGB_BLUE_PIN 17
+#define FAN_PIN 4
 
 DHT dht(DHT_PIN, DHT_TYPE);
 
@@ -29,9 +30,12 @@ const char topicTemp[] = "temp_mia_api";
 const char topicHum[] = "hum_mia_api"; 
 const char topicbrightness[] = "led_mia_api";
 const char topicRGB_led[] = "RGB_led_mia_api";
+const char topicFanMotor[] = "fan_motor_mia_api";
 
 float temp = 0.0;
 float hum = 0.0;
+
+int lastSpeed = -1;  // valore iniziale motore ventola
 
 void setup() {
   Serial.begin(115200);
@@ -69,6 +73,7 @@ void setup() {
 
   mqttClient.subscribe(topicbrightness, 1);  //sottoscrivi al topic di accensione led con QoS-1
   mqttClient.subscribe(topicRGB_led, 1);
+  mqttClient.subscribe(topicFanMotor, 1);
   mqttClient.onMessage(onMessageReceived);  //imposta la callback per gestire i messaggi
 }
 
@@ -162,6 +167,17 @@ void onMessageReceived(int messageSize) {
       analogWrite(RGB_GREEN_PIN, (int)constrain(doc["g"] | 0, 0, 255));
       analogWrite(RGB_BLUE_PIN, (int)constrain(doc["b"] | 0, 0, 255));
 
+  } else if(topic == topicFanMotor){
+    int speed = doc["speed"];
+    speed = constrain(speed, 0, 255);
+
+    if (speed != lastSpeed) {
+      analogWrite(FAN_PIN, speed);  //imposta la velcoità delle ventola
+      lastSpeed = speed;
+
+      Serial.print("Nuova velocità: ");
+      Serial.println(speed);
+    }
   }
 }
 
