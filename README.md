@@ -60,3 +60,12 @@ By going to
 http://localhost:8080/index.html
 ```
 you can access to the Swagger UI OpenAPI 
+
+## Latest news
+ardu_APIno is now available at  
+```
+https://ardu-apino.globeapp.dev/
+```
+
+Deployed using [Globe](https://globe.dev/)
+
