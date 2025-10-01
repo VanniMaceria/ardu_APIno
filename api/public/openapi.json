@@ -23,6 +23,10 @@
     {
       "url": "http://localhost:8080",
       "description": "Local server"
+    },
+    {
+      "url": "https://ardu-apino-lvjdlvs-vannimaceria.globeapp.dev/",
+      "description": "Production server"
     }
   ],
   "tags": [
