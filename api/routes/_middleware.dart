@@ -1,5 +1,12 @@
 import 'package:dart_frog/dart_frog.dart';
 
+/// Middleware globale per gestire CORS in tutte le route.
+///
+/// - Intercetta tutte le richieste HTTP prima che arrivino alla route.
+/// - Gestisce le richieste OPTIONS (preflight) restituendo status 204 e header CORS.
+/// - Per le richieste normali, aggiunge gli header CORS alla risposta generata dalla route.
+/// - Permette al frontend (es. Swagger UI) di fare richieste cross-origin senza errori.
+
 Handler middleware(Handler handler) {
   return (context) async {
     // Gestione preflight (OPTIONS)
@@ -14,11 +21,20 @@ Handler middleware(Handler handler) {
       );
     }
 
-    // Risposta normale con header CORS
     final response = await handler(context);
+
+    // Convertiamo il body in String se necessario
+    String? bodyString;
+    if (response.body is String) {
+      bodyString = response.body as String;
+    } else {
+      // Se è un oggetto diverso (es. Map), lo serializziamo in JSON
+      bodyString = response.body.toString();
+    }
+
     return Response(
       statusCode: response.statusCode,
-      body: await response.body(),
+      body: bodyString,
       headers: {
         ...response.headers,
         'Access-Control-Allow-Origin': '*',
