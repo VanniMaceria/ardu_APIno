@@ -12,7 +12,7 @@
 <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js" crossorigin></script>
 <script>
   window.onload = () => {
-    const specUrl = window.location.origin + "/openapi.json";
+    const specUrl = window.location.origin + "/openapi.json"; //in base all'origine sceglie il server
     window.ui = SwaggerUIBundle({
       url: specUrl,
       dom_id: '#swagger-ui',
